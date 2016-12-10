@@ -546,3 +546,114 @@
         (T (error "POLYMINUS called with invalid arguments"))
     )
 )
+
+;;      varpowers-reduce (varpowers)
+;; Given a list of varpowers, returns the same varpowers combining those with
+;; the same symbol.
+;; Two varpowers that share the same symbol can be compressed in one varpower
+;; whose exponent is the sum of the two original exponents.
+;; Note: this function assumes that the list is sorted using
+;; booleanLexicographicallyCompareVP.
+
+(defun varpowers-reduce (varpowers)
+    (cond
+        ((null varpowers) nil)
+        ((null (rest varpowers)) varpowers)
+        (T
+            (let ((vp1 (first varpowers))
+                  (vp2 (second varpowers))
+                 )
+                (if (equal (varpower-symbol vp1) (varpower-symbol vp2))
+                    (let ((p1 (varpower-power vp1))
+                          (p2 (varpower-power vp2))
+                          (s (varpower-symbol vp1))
+                         )
+                         (varpowers-reduce (cons
+                                                (list 'V (+ p1 p2) s)
+                                                (rest (rest varpowers))
+                                           )
+                         )
+
+                    )
+                    (cons vp1 (varpowers-reduce (rest varpowers))
+                    )
+                )
+            )
+        )
+    )
+)
+
+;;      monomial-times-monomial (m1 m2)
+;; Returns the monomial coming from the product of m1 times m2. The resulting
+;; monomial coefficient is the product of the coefficients, varpowers are the
+;; union of the original varpowers (reduced if needed).
+
+(defun monomial-times-monomial (m1 m2)
+    (if (or (null m1) (null m2))
+        nil
+        (let ((c1 (monomial-coefficient m1))
+              (c2 (monomial-coefficient m2))
+              (vp (varpowers-reduce
+                    (sort
+                        (append (varpowers m1) (varpowers m2))
+                    'booleanLexicographicallyCompareVP
+                    )
+                  )
+              )
+             )
+             (list 'M (* c1 c2) (compute-totaldegree vp) vp)
+        )
+    )
+)
+
+;;      monomial-times-poly (m p)
+;; Returns the polynomial coming from the product of the monomial m times the
+;; polynomial p (given in form of list of monomials). The resulting polynomial
+;; is the sum of m times each monomial in p.
+
+(defun monomial-times-poly (m p)
+    (if (null p)
+        nil
+        (append
+            (list (monomial-times-monomial m (first p)))
+            (monomial-times-poly m (rest p))
+        )
+    )
+)
+
+;;      poly-times-poly (p1 p2)
+;; Returns the polynomial coming from the product of p1 times p2. That product
+;; is obtained as the sum of each monomial in p1 multiplied with p2 using
+;; monomial-times-poly. The resulting polynomial is then sorted and reduced
+;; with poly-reduce if needed.
+
+(defun poly-times-poly (p1 p2)
+    (if (null p1)
+        nil
+        (poly-reduce
+            (poly-sort
+                (append
+                    (monomial-times-poly (first p1) p2)
+                    (poly-times-poly (rest p1) p2)
+                )
+            )
+        )
+    )
+)
+
+;;      polytimes (p1 p2)
+;; Returns the polynomial product of p1 times p2. Note that p1 and p2 can
+;; also be single monomials.
+
+(defun polytimes (p1 p2)
+    (cond
+        ((is-monomial p1) (polytimes (monomial-to-poly p1) p2))
+        ((is-monomial p2) (polytimes p1 (monomial-to-poly p2)))
+        ((and (is-polynomial p1) (is-polynomial p2))
+            (monomials-to-poly
+                (poly-times-poly (poly-monomials p1) (poly-monomials p2))
+            )
+        )
+        (T (error "POLYTIMES called with invalid arguments"))
+    )
+)

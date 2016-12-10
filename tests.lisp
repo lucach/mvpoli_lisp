@@ -39,6 +39,11 @@
 (equal (polyminus '(m 2 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ((M -1 1 ((V 1 A))))) )
 (equal (polyminus '(m 3 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ()) )
 
+;;;; polytimes
+
+(equal (polytimes '(m 1 7 ((v 3 s) (v 3 t) (v 1 y))) '(POLY ((M -1 1 ((V 1 X))) (M 1 2 ((V 1 X) (V 1 Y))))) ) '(POLY ((M -1 8 ((V 3 S) (V 3 T) (V 1 X) (V 1 Y))) (M 1 9 ((V 3 S) (V 3 T) (V 1 X) (V 2 Y))))) )
+(equal (polytimes '(POLY ((m 1 1 ((V 1 A))) (m 1 1 ((V 1 B))))) '(POLY ((m 1 1 ((V 1 A))) (m 1 1 ((V 1 B))))) ) '(POLY ((M 2 2 ((V 1 A) (V 1 B))) (M 1 2 ((V 2 A))) (M 1 2 ((V 2 B))))) )
+
 ;;;; monomials
 
 (equal (monomials '(POLY ((M 1 2 ((V 1 Y) (V 1 Z))) (M 1 2 ((V 1 A) (V 1 B)))))) '((M 1 2 ((V 1 A) (V 1 B))) (M 1 2 ((V 1 Y) (V 1 Z)))) )
