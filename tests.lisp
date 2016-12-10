@@ -4,6 +4,10 @@
 (equal (as-monomial '(* y (expt s 3) (expt t 3))) '(M 1 7 ((V 3 S) (V 3 T) (V 1 Y))) )
 (equal (as-monomial '(* 3 y w (expt t 3))) '(M 3 5 ((V 3 T) (V 1 W) (V 1 Y))) )
 
+; coefficients
+(equal (coefficients '(POLY ((M 1 3 ((V 3 X))))) ) '(1))
+(equal (coefficients '(POLY ((M -4 0 NIL) (M 1 2 ((V 1 X) (V 1 Y))) (M 1 7 ((V 3 S) (V 3 T) (V 1 Y)))))) '(-4 1 1))
+
 ; as-polynomial
 
 (equal (as-polynomial '(+ (* (expt y 4) z (expt x 5)) (* -1 y z r) (* (expt y 4) r (expt z 5)))) '(POLY (M -1 3 ((V 1 R) (V 1 Y) (V 1 Z))) (M 1 10 ((V 1 R) (V 4 Y) (V 5 Z))) (M 1 10 ((V 5 X) (V 4 Y) (V 1 Z)))))
