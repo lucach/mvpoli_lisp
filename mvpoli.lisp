@@ -422,3 +422,15 @@
         (T (error "COEFFICIENTS called with invalid argument"))
     )
 )
+
+;;      monomials (p)
+;; Returns the (sorted, if not already) list of monomials appearing in p.
+;; The argument p can also be a single monomial.
+
+(defun monomials (p)
+    (cond
+        ((is-polynomial p) (poly-sort (poly-monomials p)))
+        ((is-monomial p) (list p))
+        (T (error "MONOMIALS called with invalid argument"))
+    )
+)
