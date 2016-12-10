@@ -82,6 +82,22 @@
     (second p)
 )
 
+;;      monomial-to-poly (m)
+;; Given a well-formed monomial m, returns a well-formed polynomial in the
+;; form (POLY (m)).
+
+(defun monomial-to-poly (m)
+    (list 'POLY (list m))
+)
+
+;;      monomials-to-poly (ms)
+;; Given a list ms of well-formed monomials, returns a well-formed polynomial
+;; in the form (POLY ms).
+
+(defun monomials-to-poly (ms)
+    (list 'POLY ms)
+)
+
 ;;      is-polynomial (p)
 ;; Returns T if p is a well-formed polynomial, nil otherwise.
 ;; A well-formed polynomial is a list in the form (POLY (M1 M2 ... Mn)) where
@@ -478,22 +494,6 @@
         ((is-monomial p) (monomial-degree p))
         (T (error "MINDEGREE called with invalid argument"))
     )
-)
-
-;;      monomial-to-poly (m)
-;; Given a well-formed monomial m, returns a well-formed polynomial in the
-;; form (POLY (m)).
-
-(defun monomial-to-poly (m)
-    (list 'POLY (list m))
-)
-
-;;      monomials-to-poly (ms)
-;; Given a list ms of well-formed monomials, returns a well-formed polynomial
-;; in the form (POLY ms).
-
-(defun monomials-to-poly (ms)
-    (list 'POLY ms)
 )
 
 ;;      polyplus (p1 p2)
