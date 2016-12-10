@@ -514,3 +514,35 @@
         (T (error "POLYPLUS called with invalid arguments"))
     )
 )
+
+;;      negate-coeff (m)
+;; Given a well-formed monomial m, returns the same monomial with the
+;; negated coefficient.
+
+(defun negate-coeff (m)
+    (list 'M (* -1 (monomial-coefficient m)) (monomial-degree m) (varpowers m))
+)
+
+;;      polyminus (p1 p2)
+;; Returns the polynomial diff. of polynomials p1 and p2. Note that p1 and p2
+;; can also be single monomials.
+
+(defun polyminus (p1 p2)
+    (cond
+        ((is-monomial p1) (polyminus (monomial-to-poly p1) p2))
+        ((is-monomial p2) (polyminus p1 (monomial-to-poly p2)))
+        ((and (is-polynomial p1) (is-polynomial p2))
+            (monomials-to-poly
+                (poly-reduce
+                    (poly-sort
+                        (append
+                            (poly-monomials p1)
+                            (mapcar #'negate-coeff (poly-monomials p2))
+                        )
+                    )
+                )
+            )
+        )
+        (T (error "POLYMINUS called with invalid arguments"))
+    )
+)
