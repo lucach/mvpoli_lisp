@@ -275,7 +275,7 @@
     (sort monomials 'degreeCompareMonomials)
 )
 
-;;      poly-reduce (monomials)
+;;      simplify-similar-monomials (monomials)
 ;; Given a list of monomials, returns the same monomials combining similar
 ;; terms.
 ;; Definition: two monomials are similar iff they share the same
@@ -284,7 +284,7 @@
 ;; coefficient is the sum of the two original coefficient.
 ;; Note: this function assumes that the list is sorted using poly-sort.
 
-(defun poly-reduce (monomials)
+(defun simplify-similar-monomials (monomials)
     (cond
         ((null monomials) nil)
         ((null (rest monomials)) monomials)
@@ -298,14 +298,14 @@
                           (deg (monomial-degree m1))
                           (vp (varpowers m1))
                          )
-                         (poly-reduce (cons
+                         (simplify-similar-monomials (cons
                                             (list 'M (+ c1 c2) deg vp)
                                             (rest (rest monomials))
                                       )
                          )
 
                     )
-                    (cons m1 (poly-reduce (rest monomials))
+                    (cons m1 (simplify-similar-monomials (rest monomials))
                     )
                 )
             )
@@ -320,12 +320,21 @@
     (= (monomial-coefficient m) 0)
 )
 
-;;      poly-remove-zero-coeff (monomials)
+;;      remove-zero-coeff (monomials)
 ;; Given a list of monomials, returns the same list without monomials with a
 ;; zero coefficient.
 
-(defun poly-remove-zero-coeff (monomials)
+(defun remove-zero-coeff (monomials)
     (remove-if #'has-zero-coeff monomials)
+)
+
+;;      poly-reduce (monomials)
+;; Retruns a list of monomials "reduced", i.e. similar monomials are
+;; simplified using simplify-similar-monomials and monomials with a zero
+;; coefficient are stripped.
+
+(defun poly-reduce (monomials)
+    (remove-zero-coeff (simplify-similar-monomials monomials))
 )
 
 ;;      as-polynomial (expression)
@@ -337,9 +346,7 @@
 
 (defun as-polynomial (expression)
     (list 'POLY
-        (poly-remove-zero-coeff (
-            poly-reduce (poly-sort (mapcar #'as-monomial (rest expression)))
-        ))
+        (poly-reduce (poly-sort (mapcar #'as-monomial (rest expression))))
     )
 )
 
@@ -470,5 +477,40 @@
         )
         ((is-monomial p) (monomial-degree p))
         (T (error "MINDEGREE called with invalid argument"))
+    )
+)
+
+;;      monomial-to-poly (m)
+;; Given a well-formed monomial m, returns a well-formed polynomial in the
+;; form (POLY (m)).
+
+(defun monomial-to-poly (m)
+    (list 'POLY (list m))
+)
+
+;;      monomials-to-poly (ms)
+;; Given a list ms of well-formed monomials, returns a well-formed polynomial
+;; in the form (POLY ms).
+
+(defun monomials-to-poly (ms)
+    (list 'POLY ms)
+)
+
+;;      polyplus (p1 p2)
+;; Returns the polynomial sum of polynomials p1 and p2. Note that p1 and p2
+;; can also be single monomials.
+
+(defun polyplus (p1 p2)
+    (cond
+        ((is-monomial p1) (polyplus (monomial-to-poly p1) p2))
+        ((is-monomial p2) (polyplus p1 (monomial-to-poly p2)))
+        ((and (is-polynomial p1) (is-polynomial p2))
+            (monomials-to-poly
+                (poly-reduce (poly-sort (
+                    append (poly-monomials p1) (poly-monomials p2))
+                ))
+            )
+        )
+        (T (error "POLYPLUS called with invalid arguments"))
     )
 )
