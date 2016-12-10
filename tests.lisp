@@ -36,8 +36,8 @@
 
 ;;;; polyminus
 
-(equal (polyplus '(m 2 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ((M -1 1 ((V 1 A))))) )
-(equal (polyplus '(m 3 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ()) )
+(equal (polyminus '(m 2 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ((M -1 1 ((V 1 A))))) )
+(equal (polyminus '(m 3 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ()) )
 
 ;;;; monomials
 
