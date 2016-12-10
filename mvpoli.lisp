@@ -336,7 +336,7 @@
 ;; as-monomial.
 
 (defun as-polynomial (expression)
-    (cons 'POLY
+    (list 'POLY
         (poly-remove-zero-coeff (
             poly-reduce (poly-sort (mapcar #'as-monomial (rest expression)))
         ))
