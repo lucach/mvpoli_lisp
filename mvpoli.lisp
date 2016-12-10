@@ -434,3 +434,41 @@
         (T (error "MONOMIALS called with invalid argument"))
     )
 )
+
+;;      maxdegree (p)
+;; Returns the maximum degree among monomials in p. The argument p can also
+;; be a single monomial.
+
+(defun maxdegree (p)
+    (cond
+        ((is-polynomial p)
+            (let ((ms (poly-monomials p)))
+                (if (null ms)
+                    0
+                    (reduce #'max (mapcar #'monomial-degree ms))
+                )
+            )
+        )
+        ((is-monomial p) (monomial-degree p))
+        (T (error "MAXDEGREE called with invalid argument"))
+    )
+)
+
+;;      mindegree (p)
+;; Returns the minimum degree among monomials in p. The argument p can also
+;; be a single monomial.
+
+(defun mindegree (p)
+    (cond
+        ((is-polynomial p)
+            (let ((ms (poly-monomials p)))
+                (if (null ms)
+                    0
+                    (reduce #'min (mapcar #'monomial-degree ms))
+                )
+            )
+        )
+        ((is-monomial p) (monomial-degree p))
+        (T (error "MINDEGREE called with invalid argument"))
+    )
+)
