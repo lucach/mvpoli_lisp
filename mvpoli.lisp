@@ -119,10 +119,10 @@
 ;; varpowers.
 
 (defun vars-of (monomial)
-	(if (is-monomial monomial)
-		(mapcar #'varpower-symbol (varpowers monomial))
-		(error "VARS-OF called with invalid argument")
-	)
+    (if (is-monomial monomial)
+        (mapcar #'varpower-symbol (varpowers monomial))
+        (error "VARS-OF called with invalid argument")
+    )
 )
 
 ;;      compute-totaldegree (varpowers)
@@ -644,5 +644,23 @@
             )
         )
         (T (error "POLYTIMES called with invalid arguments"))
+    )
+)
+
+;;      variables(p)
+;; Given a polynomial p, returns a list of variables appearing in every
+;; monomial in p, sorted and without duplicates. Note that poly can also
+;; be a single monomial.
+
+(defun variables (p)
+    (cond
+        ((is-polynomial p)
+            (sort
+                (remove-duplicates (mapcan #'vars-of (poly-monomials p)))
+                #'string<
+            )
+        )
+        ((is-monomial p) (variables (monomial-to-poly p)))
+        (T (error "VARIABLES called with invalid argument"))
     )
 )
