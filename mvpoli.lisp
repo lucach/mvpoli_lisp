@@ -114,26 +114,15 @@
     )
 )
 
-;;      vars-of-varpowers (varpowers)
-;; Given a list of varpowers in the form (VP1 VP2 ... VPn), returns a list
-;; (S1 S2 ... Sn) where each Si is the symbol of the i-th VP.
-
-(defun vars-of-varpowers (varpowers)
-    (if (null varpowers)
-        nil
-        (cons
-            (third (first varpowers))
-            (vars-of-varpowers (rest varpowers))
-        )
-    )
-)
-
 ;;      vars-of (monomial)
 ;; Given a monomial, returns a list of variable symbols appearing in its
 ;; varpowers.
 
 (defun vars-of (monomial)
-    (vars-of-varpowers (varpowers monomial))
+	(if (is-monomial monomial)
+		(mapcar #'varpower-symbol (varpowers monomial))
+		(error "VARS-OF called with invalid argument")
+	)
 )
 
 ;;      compute-totaldegree (varpowers)
