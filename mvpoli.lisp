@@ -664,3 +664,73 @@
         (T (error "VARIABLES called with invalid argument"))
     )
 )
+
+;;      varpowerval(vp variables-with-values)
+;; Given a varpower vp and an associative list of symbols-values, returns the
+;; variable value (found as the second element in the associative list using
+;; the symbol as key) raised to the power-th power.
+
+(defun varpowerval (vp variables-with-values)
+    (let
+        ((base (rest (assoc (varpower-symbol vp) variables-with-values))))
+        (expt base (varpower-power vp))
+    )
+)
+
+;;      varpowersval(vps variables-with-values)
+;; Given a list of varpowers vps and an associative list of symbols-values,
+;; returns the product of all varpower values in vps, calculated using
+;; varpowerval.
+
+(defun varpowersval (vps variables-with-values)
+    (if (null vps)
+        1
+        (* (varpowerval (first vps) variables-with-values)
+           (varpowersval (rest vps) variables-with-values)
+        )
+    )
+)
+
+;;      monomialval(m variabes-with-values)
+;; Given a monomial m and an associative list of symbols-values, returns the
+;; product between the coefficient of m and the value of its varpowers
+;; calculated using varpowersval.
+
+(defun monomialval (m variables-with-values)
+    (* (monomial-coefficient m)
+       (varpowersval (varpowers m) variables-with-values)
+    )
+)
+
+;;      monomialsval(ms variabes-with-values)
+;; Given a list of monomials ms and an associative list of symbols-values,
+;; returns the *sum* of values of every monomial in ms, calculated using
+;; monomialval.
+
+(defun monomialsval (ms variables-with-values)
+    (if (null ms)
+        0
+        (+ (monomialval (first ms) variables-with-values)
+           (monomialsval (rest ms) variables-with-values)
+        )
+    )
+)
+
+;;      polyval(p variablevalues)
+;; Given a polynomial p and a list of variable values, returns the value of p
+;; in the n-dimensional point represented by the list variablevalues. The i-th
+;; value in variablevalues matches with the i-th variable resulting from
+;; variables.
+;; Polynomial p can also be a single monomial.
+
+(defun polyval (p variablevalues)
+    (cond
+        ((is-polynomial p)
+            (monomialsval (monomials p)
+                          (pairlis (variables p) variablevalues)
+            )
+        )
+        ((is-monomial p) (polyval (monomial-to-poly p) variablevalues))
+        (T (error "POLYVAL called with invalid arguments"))
+    )
+)

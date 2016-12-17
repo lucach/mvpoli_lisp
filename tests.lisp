@@ -34,6 +34,13 @@
 (equal (as-polynomial '(+ (* 0 a) (* x))) '(POLY ((M 1 1 ((V 1 X))))))
 (equal (as-polynomial '(+ (* (expt a 2)) (* a c) (* a) (* a z))) '(POLY ((M 1 1 ((V 1 A))) (M 1 2 ((V 1 A) (V 1 C))) (M 1 2 ((V 1 A) (V 1 Z))) (M 1 2 ((V 2 A))))))
 
+;;;; polyval
+
+(equal (polyval '(POLY ((M 1 3 ((V 2 X) (V 1 Y))))) '(2 2)) 8)
+(equal (polyval '(POLY ((M 1 3 ((V 2 X) (V 1 Y))) (M 3 1 ((V 1 X))))) '(2 2)) 14)
+(equal (polyval '(M 1 2 ((V 2 A))) '(3)) 9)
+
+
 ;;;; polyplus
 
 (equal (polyplus '(m 2 1 ((v 1 a))) '(m 3 1 ((v 1 a)))) '(POLY ((M 5 1 ((V 1 A))))) )
