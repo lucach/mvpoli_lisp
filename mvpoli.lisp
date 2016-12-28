@@ -214,16 +214,24 @@
 )
 
 ;;      eval-if-possible (expression)
-;; Retruns the evaluation of expression when there are no errors.
+;; Returns the evaluation of expression when there are no errors.
 ;; Otherwise returns NIL.
 
 (defun eval-if-possible (expression)
     (ignore-errors (eval expression))
 )
 
+;;      as-monomial (expression)
+;; Parses expression and returns a well-formed representation of a monomial.
+;; See is-monomial to get an explanation about well-formed monomials.
+;; Expression can be a single number (i.e., the coefficient) or a list where
+;; the first element is '*', possibily followed by a number intepreted as
+;; coefficient. The rest of the items in the list are varpowers, i.e. lists in
+;; the form (expt varsymbol power) or varsymbols (with an implied power of 1).
+
 (defun as-monomial (expression)
-    (if (numberp expression)
-        (list 'M expression 0 NIL)
+    (if (numberp (eval-if-possible expression))
+        (list 'M (eval expression) 0 NIL)
         (if (numberp (eval-if-possible (second expression)))
             (append
                 (list 'M (eval (second expression)))

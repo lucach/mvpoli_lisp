@@ -4,6 +4,7 @@
 (equal (as-monomial '(* y (expt s 3) (expt t 3))) '(M 1 7 ((V 3 S) (V 3 T) (V 1 Y))) )
 (equal (as-monomial 42) '(M 42 0 NIL))
 (equal (as-monomial '(* (* 2 (cos 0)) x)) '(M 2.0 1 ((V 1 X))))
+(equal (as-monomial '(cos 0)) '(M 1.0 1 NIL))
 (equal (as-monomial '(* (expt x 0))) '(M 1 0 NIL))
 (equal (as-monomial '(* (expt x 3) (expt y 0) (expt z 2))) '(M 1 5 ((V 3 X) (V 2 Z))))
 (equal (as-monomial '(* (expt a 2) (expt a 2))) '(M 1 4 ((V 4 A))) )
