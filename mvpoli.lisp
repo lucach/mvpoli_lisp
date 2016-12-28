@@ -221,30 +221,92 @@
     (ignore-errors (eval expression))
 )
 
-;;      as-monomial (expression)
-;; Parses expression and returns a well-formed representation of a monomial.
-;; See is-monomial to get an explanation about well-formed monomials.
+;;      has-zero-exp (vp)
+;; Given a varpower vp, returns T if vp has a zero exponent, NIL otherwise.
+
+(defun has-zero-exp (vp)
+    (= (varpower-power vp) 0)
+)
+
+;;      remove-zero-exp (vps)
+;; Given a list of varpowers, returns the same list without those with a zero
+;; exponent.
+
+(defun remove-zero-exp (varpowers)
+    (remove-if #'has-zero-exp varpowers)
+)
+
+;;      simplify-similar-varpowers (varpowers)
+;; Given a list of varpowers, returns the same varpowers combining varpowers
+;; with the same symbol.
+;; Two varpowers with the same symbol can be compressed in one varpower whose
+;; exponent is the sum of the two original exponents.
+;; Note: this function assumes that the list is sorted using poly-sort.
+
+(defun simplify-similar-varpowers (varpowers)
+    (cond
+        ((null varpowers) NIL)
+        ((null (rest varpowers)) varpowers)
+        (T
+            (let ((vp-s1 (varpower-symbol (first varpowers)))
+                  (vp-s2 (varpower-symbol (second varpowers)))
+                  (vp-p1 (varpower-power (first varpowers)))
+                  (vp-p2 (varpower-power (second varpowers)))
+                 )
+                (if (equal vp-s1 vp-s2)
+                    (simplify-similar-varpowers (cons
+                            (list 'V (+ vp-p1 vp-p2) vp-s1)
+                            (rest (rest varpowers))
+                        )
+                    )
+                    (cons (first varpowers)
+                          (simplify-similar-varpowers (rest varpowers))
+                    )
+                )
+            )
+        )
+    )
+)
+
+;;      parse-monomial (expression)
+;; Parses expression and returns a list with two elements. The first is the
+;; number representing the coefficient. The second is a list of well-formed
+;; varpowers.
 ;; Expression can be a single number (i.e., the coefficient) or a list where
 ;; the first element is '*', possibily followed by a number intepreted as
 ;; coefficient. The rest of the items in the list are varpowers, i.e. lists in
 ;; the form (expt varsymbol power) or varsymbols (with an implied power of 1).
 
-(defun as-monomial (expression)
+(defun parse-monomial (expression)
     (if (numberp (eval-if-possible expression))
-        (list 'M (eval expression) 0 NIL)
+        (list (eval expression) NIL)
         (if (numberp (eval-if-possible (second expression)))
-            (append
-                (list 'M (eval (second expression)))
-                (let
-                    ((vp (parse-varpowers-and-sort (rest (rest expression)))))
-                    (list (compute-totaldegree vp) vp)
-                )
+            (list
+                (eval (second expression))
+                (parse-varpowers-and-sort (rest (rest expression)))
             )
-            (append
-                (list 'M 1)
-                (let ((vp (parse-varpowers-and-sort (rest expression))))
-                    (list (compute-totaldegree vp) vp)
-                )
+            (list
+                1
+                (parse-varpowers-and-sort (rest expression))
+            )
+        )
+    )
+)
+
+;;      as-monomial (expression)
+;; Parses expression with parse-monomial, then returns a well-formed monomial.
+;; Varpowers with a zero exponent are removed and varpowers with the same
+;; symbol are collapsed.
+;; See is-monomial to get an explanation about well-formed monomials.
+
+(defun as-monomial (expression)
+    (let ((coeff-and-vps (parse-monomial expression)))
+        (list
+            'M
+            (first coeff-and-vps)
+            (compute-totaldegree (second coeff-and-vps))
+            (simplify-similar-varpowers
+                (remove-zero-exp (second coeff-and-vps))
             )
         )
     )
@@ -303,7 +365,7 @@
 ;;             varpowers; i.e., they differ only from coefficient.
 ;; Two similar monomials can be compressed in one monomial whose
 ;; coefficient is the sum of the two original coefficient.
-;; Note: this function assumes that the list is sorted using poly-sort.
+;; Note: this function assumes that the list is sorted.
 
 (defun simplify-similar-monomials (monomials)
     (cond
@@ -335,7 +397,7 @@
 )
 
 ;;      has-zero-coeff (m)
-;; Given a monomial m, returns T if m has a zero coefficient, nil otherwise.
+;; Given a monomial m, returns T if m has a zero coefficient, NIL otherwise.
 
 (defun has-zero-coeff (m)
     (= (monomial-coefficient m) 0)
