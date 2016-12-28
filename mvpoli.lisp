@@ -213,12 +213,20 @@
     (sort (parse-varpowers expression) 'booleanLexicographicallyCompareVP)
 )
 
+;;      eval-if-possible (expression)
+;; Retruns the evaluation of expression when there are no errors.
+;; Otherwise returns NIL.
+
+(defun eval-if-possible (expression)
+    (ignore-errors (eval expression))
+)
+
 (defun as-monomial (expression)
     (if (numberp expression)
         (list 'M expression 0 NIL)
-        (if (numberp (second expression))
+        (if (numberp (eval-if-possible (second expression)))
             (append
-                (list 'M (second expression))
+                (list 'M (eval (second expression)))
                 (let
                     ((vp (parse-varpowers-and-sort (rest (rest expression)))))
                     (list (compute-totaldegree vp) vp)
@@ -348,11 +356,29 @@
 ;; The expression has to be a list where the first element is the plus sign
 ;; "+" and the second element is a list of expressions as defined in
 ;; as-monomial.
+;; The expression can also be the superficial representation of a single
+;; monomial, which is parsed in turn with as-monomial.
 
 (defun as-polynomial (expression)
-    (monomials-to-poly
-        (poly-reduce (poly-sort (mapcar #'as-monomial (rest expression))))
+    (if (and
+            (listp expression)
+            (equal (first expression) '+)
+        )
+        (monomials-to-poly
+                (poly-reduce
+                    (poly-sort (mapcar #'as-monomial (rest expression)))
+                )
+        )
+        (monomials-to-poly (list (as-monomial expression)))
     )
+)
+
+;;      parse-if-possible (expr)
+;; Returns a well-formed representation of the polynomial corresponding to
+;; expr when possible. Otherwise returns NIL.
+
+(defun parse-if-possible (expr)
+    (ignore-errors (as-polynomial expr))
 )
 
 ;;      varpower-to-string (vp)
@@ -431,7 +457,13 @@
     (cond
         ((is-polynomial p) (mapcar #'monomial-coefficient (poly-monomials p)))
         ((is-monomial p) (list (monomial-coefficient p)))
-        (T (error "COEFFICIENTS called with invalid argument"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "COEFFICIENTS called with invalid argument")
+                    (coefficients parsed)
+                )
+            )
+        )
     )
 )
 
@@ -443,7 +475,13 @@
     (cond
         ((is-polynomial p) (poly-sort (poly-monomials p)))
         ((is-monomial p) (list p))
-        (T (error "MONOMIALS called with invalid argument"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "MONOMIALS called with invalid argument")
+                    (monomials parsed)
+                )
+            )
+        )
     )
 )
 
@@ -462,7 +500,13 @@
             )
         )
         ((is-monomial p) (monomial-degree p))
-        (T (error "MAXDEGREE called with invalid argument"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "MAXDEGREE called with invalid argument")
+                    (maxdegree parsed)
+                )
+            )
+        )
     )
 )
 
@@ -481,7 +525,13 @@
             )
         )
         ((is-monomial p) (monomial-degree p))
-        (T (error "MINDEGREE called with invalid argument"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "MINDEGREE called with invalid argument")
+                    (mindegree parsed)
+                )
+            )
+        )
     )
 )
 
@@ -500,7 +550,15 @@
                 ))
             )
         )
-        (T (error "POLYPLUS called with invalid arguments"))
+        (T (let ((parsed1 (if (is-polynomial p1) p1 (parse-if-possible p1)))
+                 (parsed2 (if (is-polynomial p2) p2 (parse-if-possible p2)))
+                )
+                (if (or (null parsed1) (null parsed2))
+                    (error "POLYPLUS called with invalid arguments")
+                    (polyplus parsed1 parsed2)
+                )
+            )
+        )
     )
 )
 
@@ -532,7 +590,15 @@
                 )
             )
         )
-        (T (error "POLYMINUS called with invalid arguments"))
+        (T (let ((parsed1 (if (is-polynomial p1) p1 (parse-if-possible p1)))
+                 (parsed2 (if (is-polynomial p2) p2 (parse-if-possible p2)))
+                )
+                (if (or (null parsed1) (null parsed2))
+                    (error "POLYMINUS called with invalid arguments")
+                    (polyminus parsed1 parsed2)
+                )
+            )
+        )
     )
 )
 
@@ -643,7 +709,15 @@
                 (poly-times-poly (poly-monomials p1) (poly-monomials p2))
             )
         )
-        (T (error "POLYTIMES called with invalid arguments"))
+        (T (let ((parsed1 (if (is-polynomial p1) p1 (parse-if-possible p1)))
+                 (parsed2 (if (is-polynomial p2) p2 (parse-if-possible p2)))
+                )
+                (if (or (null parsed1) (null parsed2))
+                    (error "POLYMINUS called with invalid arguments")
+                    (polytimes parsed1 parsed2)
+                )
+            )
+        )
     )
 )
 
@@ -661,7 +735,13 @@
             )
         )
         ((is-monomial p) (variables (monomial-to-poly p)))
-        (T (error "VARIABLES called with invalid argument"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "VARIABLES called with invalid argument")
+                    (variables parsed)
+                )
+            )
+        )
     )
 )
 
@@ -731,6 +811,12 @@
             )
         )
         ((is-monomial p) (polyval (monomial-to-poly p) variablevalues))
-        (T (error "POLYVAL called with invalid arguments"))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "POLYVAL called with invalid arguments")
+                    (polyval parsed variablevalues)
+                )
+            )
+        )
     )
 )
