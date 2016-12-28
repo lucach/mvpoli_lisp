@@ -36,13 +36,13 @@
 )
 
 ;;      is-varpower (vp)
-;; Returns T if vp is a well-formed varpower, nil otherwise.
+;; Returns T if vp is a well-formed varpower, NIL otherwise.
 ;; A well-formed vp is a list in the form (V p s) where p is a non-negative
 ;; integer and s is a symbol.
 
 (defun is-varpower (vp)
     (and (listp vp)
-         (eq 'v (first vp))
+         (eq 'V (first vp))
          (let ((p (varpower-power vp))
                (v (varpower-symbol vp))
                )
@@ -55,14 +55,14 @@
 )
 
 ;;      is-monomial (m)
-;; Returns T if p is a well-formed monomial, nil otherwise.
+;; Returns T if p is a well-formed monomial, NIL otherwise.
 ;; A well-formed monomial is a list in the form (M coeff td VPs) where
 ;; td is a non-negative integer and VPs is a list of well-formed varpowers
 ;; (see is-varpower).
 
 (defun is-monomial (m)
     (and (listp m)
-        (eq 'm (first m))
+        (eq 'M (first m))
         (let ((mtd (monomial-degree m))
               (vps (varpowers m))
              )
@@ -99,13 +99,13 @@
 )
 
 ;;      is-polynomial (p)
-;; Returns T if p is a well-formed polynomial, nil otherwise.
+;; Returns T if p is a well-formed polynomial, NIL otherwise.
 ;; A well-formed polynomial is a list in the form (POLY (M1 M2 ... Mn)) where
 ;; each Mi is a well-formed monomial (see is-monomial).
 
 (defun is-polynomial (p)
     (and (listp p)
-         (eq 'poly (first p))
+         (eq 'POLY (first p))
          (let ((ms (poly-monomials p)))
             (and (listp ms)
                  (every #'is-monomial ms)
@@ -192,7 +192,7 @@
 )
 
 ;;      booleanLexicographicallyCompareVP (VP1 VP2)
-;; Returns T when lexicographicallyCompareVP returns 0 or 1, nil otherwise.
+;; Returns T when lexicographicallyCompareVP returns 0 or 1, NIL otherwise.
 ;; In other words, this function "groups" together the cases when the VP1 has
 ;; to come before VP2 or when they are the same.
 ;; This "predicate" is needed by parse-varpowers-and-sort which uses the
@@ -200,8 +200,8 @@
 
 (defun booleanLexicographicallyCompareVP (VP1 VP2)
     (if (>= (lexicographicallyCompareVP VP1 VP2) 0)
-        t
-        nil
+        T
+        NIL
     )
 )
 
@@ -314,7 +314,7 @@
 
 ;;      lexicographicallyCompareMonomials (VPs1 VPs2)
 ;; Returns T if lexicographicallyCompareVP applied to the first elements of
-;; each list returns 1. Returns nil if lexicographicallyCompareVP returns -1.
+;; each list returns 1. Returns NIL if lexicographicallyCompareVP returns -1.
 ;; Otherwise, when lexicographicallyCompareVP returns 0, this function
 ;; recursively calls itself discarding the first elements of the lists.
 
@@ -324,10 +324,10 @@
             (VP2 (first VPs2))
          )
         (cond
-            ((null VP1) t)
-            ((null VP2) nil)
-            ((= (lexicographicallyCompareVP VP1 VP2) 1) t)
-            ((= (lexicographicallyCompareVP VP1 VP2) -1) nil)
+            ((null VP1) T)
+            ((null VP2) NIL)
+            ((= (lexicographicallyCompareVP VP1 VP2) 1) T)
+            ((= (lexicographicallyCompareVP VP1 VP2) -1) NIL)
             (T (lexicographicallyCompareMonomials (rest VPs1) (rest VPs2)))
         )
     )
@@ -335,7 +335,7 @@
 
 ;;      degreeCompareMonomials (m1 m2)
 ;; Returns T if m1 has a total degree less than total degree of m2,
-;; or nil if m1 has a total degree greater than total degree of m2.
+;; or NIL if m1 has a total degree greater than total degree of m2.
 ;; When m1 and m2 have the same total degree, returns the result of
 ;; lexicographicallyCompareMonomials applied to the varpowers of m1 and m2.
 
@@ -344,9 +344,9 @@
             (deg1 (monomial-degree m1))
             (deg2 (monomial-degree m2))
          )
-        (cond ((< deg1 deg2) t)
-              ((> deg1 deg2) nil)
-              (t (lexicographicallyCompareMonomials (varpowers m1) (varpowers m2)))
+        (cond ((< deg1 deg2) T)
+              ((> deg1 deg2) NIL)
+              (T (lexicographicallyCompareMonomials (varpowers m1) (varpowers m2)))
         )
     )
 )
@@ -369,7 +369,7 @@
 
 (defun simplify-similar-monomials (monomials)
     (cond
-        ((null monomials) nil)
+        ((null monomials) NIL)
         ((null (rest monomials)) monomials)
         (T
             (let ((m1 (first monomials))
@@ -457,8 +457,8 @@
 
 (defun varpower-to-string (vp)
     (if (= (varpower-power vp) 1)
-        (format nil "~A" (varpower-symbol vp))
-        (format nil "~A^~D" (varpower-symbol vp) (varpower-power vp))
+        (format NIL "~A" (varpower-symbol vp))
+        (format NIL "~A^~D" (varpower-symbol vp) (varpower-power vp))
     )
 )
 
@@ -471,7 +471,7 @@
     (cond
         ((null vps) "")
         ((null (rest vps)) (varpower-to-string (first vps)))
-        (T (format nil "~A ~A" (varpower-to-string (first vps))
+        (T (format NIL "~A ~A" (varpower-to-string (first vps))
                         (varpowers-to-string (rest vps))
             )
         )
@@ -485,8 +485,8 @@
 
 (defun monomial-to-string (m)
     (if (= (monomial-coefficient m) 1)
-        (format nil "~A" (varpowers-to-string (varpowers m)))
-        (format nil "~D ~A" (monomial-coefficient m)
+        (format NIL "~A" (varpowers-to-string (varpowers m)))
+        (format NIL "~D ~A" (monomial-coefficient m)
                           (varpowers-to-string (varpowers m))
         )
     )
@@ -501,9 +501,9 @@
 (defun monomials-to-string (monomials)
     (cond ((null monomials) "")
           ((null (rest monomials))
-            (format nil "~A" (monomial-to-string (first monomials)))
+            (format NIL "~A" (monomial-to-string (first monomials)))
           )
-          (T (format nil "~A + ~A" (monomial-to-string (first monomials))
+          (T (format NIL "~A + ~A" (monomial-to-string (first monomials))
                                  (monomials-to-string (rest monomials))
              )
           )
@@ -682,7 +682,7 @@
 
 (defun varpowers-reduce (varpowers)
     (cond
-        ((null varpowers) nil)
+        ((null varpowers) NIL)
         ((null (rest varpowers)) varpowers)
         (T
             (let ((vp1 (first varpowers))
@@ -715,7 +715,7 @@
 
 (defun monomial-times-monomial (m1 m2)
     (if (or (null m1) (null m2))
-        nil
+        NIL
         (let ((c1 (monomial-coefficient m1))
               (c2 (monomial-coefficient m2))
               (vp (varpowers-reduce
@@ -738,7 +738,7 @@
 
 (defun monomial-times-poly (m p)
     (if (null p)
-        nil
+        NIL
         (append
             (list (monomial-times-monomial m (first p)))
             (monomial-times-poly m (rest p))
@@ -754,7 +754,7 @@
 
 (defun poly-times-poly (p1 p2)
     (if (null p1)
-        nil
+        NIL
         (poly-reduce
             (poly-sort
                 (append
