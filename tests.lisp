@@ -52,6 +52,7 @@
 (equal (polyval '(* (expt x 2) y) '(2 2)) 8)
 (equal (polyval '(+ (* (expt x 2) y) (* 3 x)) '(2 2)) 14)
 (equal (polyval '(M 1 2 ((V 2 A))) '(3)) 9)
+(equal (polyval '(* 3) NIL) 3)
 
 ;;;; polyplus
 
