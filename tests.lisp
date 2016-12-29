@@ -11,6 +11,7 @@
 (equal (as-monomial '(* (expt radius 2))) '(M 1 2 ((V 2 RADIUS))))
 (equal (as-monomial '(* -1 x)) '(M -1 1 ((V 1 X))))
 (equal (as-monomial '(* -2 x)) '(M -2 1 ((V 1 X))))
+(equal (as-monomial '(* 0 x)) '(M 0 0 NIL))
 
 ;;;; coefficients
 

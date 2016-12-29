@@ -293,6 +293,18 @@
     )
 )
 
+;;      normalize-zero (coeff-and-vps)
+;; Returns the argument unmodified if it has a non-zero coefficient.
+;; Otherwise, returns the coefficient and the varpowers of the standard zero
+;; monomial, i.e. (0 NIL).
+
+(defun normalize-zero (coeff-and-vps)
+    (if (= (first coeff-and-vps) 0)
+        (list 0 NIL)
+        coeff-and-vps
+    )
+)
+
 ;;      as-monomial (expression)
 ;; Parses expression with parse-monomial, then returns a well-formed monomial.
 ;; Varpowers with a zero exponent are removed and varpowers with the same
@@ -300,7 +312,7 @@
 ;; See is-monomial to get an explanation about well-formed monomials.
 
 (defun as-monomial (expression)
-    (let ((coeff-and-vps (parse-monomial expression)))
+    (let ((coeff-and-vps (normalize-zero (parse-monomial expression))))
         (list
             'M
             (first coeff-and-vps)
