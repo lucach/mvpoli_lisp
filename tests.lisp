@@ -9,6 +9,8 @@
 (equal (as-monomial '(* (expt x 3) (expt y 0) (expt z 2))) '(M 1 5 ((V 3 X) (V 2 Z))))
 (equal (as-monomial '(* (expt a 2) (expt a 2))) '(M 1 4 ((V 4 A))) )
 (equal (as-monomial '(* (expt radius 2))) '(M 1 2 ((V 2 RADIUS))))
+(equal (as-monomial '(* -1 x)) '(M -1 1 ((V 1 X))))
+(equal (as-monomial '(* -2 x)) '(M -2 1 ((V 1 X))))
 
 ;;;; coefficients
 
