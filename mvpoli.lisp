@@ -451,7 +451,11 @@
                     (poly-sort (mapcar #'as-monomial (rest expression)))
                 )
         )
-        (monomials-to-poly (list (as-monomial expression)))
+        (monomials-to-poly
+                (poly-reduce
+                    (poly-sort (list (as-monomial expression)))
+                )
+        )
     )
 )
 
