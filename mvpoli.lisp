@@ -888,22 +888,23 @@
 ;; value in variablevalues matches with the i-th variable resulting from
 ;; variables.
 ;; Polynomial p can also be a single monomial.
+;; Exceeding values in variablevalues are ignored.
 
 (defun polyval (p variablevalues)
     (cond
         ((is-polynomial p)
-          (let ((l1 (list-length (variables p)))
-                (l2 (list-length variablevalues))
-               )
-            (if (> l1 l2)
-              (error "POLYVAL called with invalid arguments")
-              (let ((reduced-variablevalues (subseq variablevalues 0 l1)))
-                (monomialsval (monomials p)
-                  (pairlis (variables p) reduced-variablevalues)
+            (let ((l1 (list-length (variables p)))
+                  (l2 (list-length variablevalues))
+                 )
+                (if (> l1 l2)
+                    (error "POLYVAL called with invalid arguments")
+                    (let ((new-variablevalues (subseq variablevalues 0 l1)))
+                        (monomialsval (monomials p)
+                            (pairlis (variables p) new-variablevalues)
+                        )
+                    )
                 )
-              )
             )
-          )
         )
         ((is-monomial p) (polyval (monomial-to-poly p) variablevalues))
         (T (let ((parsed (parse-if-possible p)))
