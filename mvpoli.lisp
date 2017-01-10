@@ -210,7 +210,7 @@
 ;; booleanLexicographicallyCompareVP.
 
 (defun parse-varpowers-and-sort (expression)
-    (sort (parse-varpowers expression) 'booleanLexicographicallyCompareVP)
+    (sort (copy-seq (parse-varpowers expression)) 'booleanLexicographicallyCompareVP)
 )
 
 ;;      eval-if-possible (expression)
@@ -367,7 +367,7 @@
 ;; Sort a list of monomials using degreeCompareMonomials as comparator.
 
 (defun poly-sort (monomials)
-    (sort monomials 'degreeCompareMonomials)
+    (sort (copy-seq monomials) 'degreeCompareMonomials)
 )
 
 ;;      simplify-similar-monomials (monomials)
@@ -736,8 +736,8 @@
               (c2 (monomial-coefficient m2))
               (vp (varpowers-reduce
                     (sort
-                        (append (varpowers m1) (varpowers m2))
-                    'booleanLexicographicallyCompareVP
+                        (copy-seq (append (varpowers m1) (varpowers m2)))
+                        'booleanLexicographicallyCompareVP
                     )
                   )
               )
@@ -816,7 +816,9 @@
     (cond
         ((is-polynomial p)
             (sort
-                (remove-duplicates (mapcan #'vars-of (poly-monomials p)))
+                (copy-seq
+                    (remove-duplicates (mapcan #'vars-of (poly-monomials p)))
+                )
                 #'string<
             )
         )
