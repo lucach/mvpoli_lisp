@@ -210,7 +210,9 @@
 ;; booleanLexicographicallyCompareVP.
 
 (defun parse-varpowers-and-sort (expression)
-    (sort (copy-seq (parse-varpowers expression)) 'booleanLexicographicallyCompareVP)
+    (sort (copy-seq (parse-varpowers expression))
+          'booleanLexicographicallyCompareVP
+    )
 )
 
 ;;      eval-if-possible (expression)
@@ -358,7 +360,9 @@
          )
         (cond ((< deg1 deg2) T)
               ((> deg1 deg2) NIL)
-              (T (lexicographicallyCompareMonomials (varpowers m1) (varpowers m2)))
+              (T (lexicographicallyCompareMonomials
+                    (varpowers m1) (varpowers m2))
+              )
         )
     )
 )
@@ -658,7 +662,9 @@
 ;; negated coefficient.
 
 (defun negate-coeff (m)
-    (list 'M (* -1 (monomial-coefficient m)) (monomial-degree m) (varpowers m))
+    (list 'M
+        (* -1 (monomial-coefficient m)) (monomial-degree m) (varpowers m)
+    )
 )
 
 ;;      polyminus (p1 p2)
