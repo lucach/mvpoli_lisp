@@ -18,6 +18,7 @@
 (equal (coefficients '(POLY ((M 1 3 ((V 3 X))))) ) '(1))
 (equal (coefficients '(* (expt x 3))) '(1))
 (equal (coefficients '(POLY ((M -4 0 NIL) (M 1 2 ((V 1 X) (V 1 Y))) (M 1 7 ((V 3 S) (V 3 T) (V 1 Y)))))) '(-4 1 1))
+(equal (coefficients '(POLY NIL)) '(0))
 
 ;;;; variables
 

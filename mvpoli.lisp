@@ -535,36 +535,41 @@
     (format t "~A" (monomials-to-string (poly-monomials p)))
 )
 
-;;      coefficients (p)
-;; Returns a list where the i-th element is the coefficient of the i-th
-;; monomial in polynomial p. The argument p can also be a single monomial.
-
-(defun coefficients (p)
-    (cond
-        ((is-polynomial p) (mapcar #'monomial-coefficient (poly-monomials p)))
-        ((is-monomial p) (list (monomial-coefficient p)))
-        (T (let ((parsed (parse-if-possible p)))
-                (if (null parsed)
-                    (error "COEFFICIENTS called with invalid argument")
-                    (coefficients parsed)
-                )
-            )
-        )
-    )
-)
-
 ;;      monomials (p)
 ;; Returns the (sorted, if not already) list of monomials appearing in p.
 ;; The argument p can also be a single monomial.
 
 (defun monomials (p)
     (cond
-        ((is-polynomial p) (poly-sort (poly-monomials p)))
+        ((is-polynomial p)
+            (if (null (poly-monomials p))
+                (list '(M 0 0 NIL))
+                (poly-sort (poly-monomials p))
+            )
+        )
         ((is-monomial p) (list p))
         (T (let ((parsed (parse-if-possible p)))
                 (if (null parsed)
                     (error "MONOMIALS called with invalid argument")
                     (monomials parsed)
+                )
+            )
+        )
+    )
+)
+
+;;      coefficients (p)
+;; Returns a list where the i-th element is the coefficient of the i-th
+;; monomial in polynomial p. The argument p can also be a single monomial.
+
+(defun coefficients (p)
+    (cond
+        ((is-polynomial p) (mapcar #'monomial-coefficient (monomials p)))
+        ((is-monomial p) (list (monomial-coefficient p)))
+        (T (let ((parsed (parse-if-possible p)))
+                (if (null parsed)
+                    (error "COEFFICIENTS called with invalid argument")
+                    (coefficients parsed)
                 )
             )
         )
